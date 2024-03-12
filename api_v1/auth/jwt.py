@@ -1,0 +1,82 @@
+from fastapi import (
+    Depends,
+    Form,
+    HTTPException,
+    status,
+)
+from fastapi.security import OAuth2PasswordBearer
+from jwt.exceptions import InvalidTokenError
+
+from api_v1.auth import utils as auth_utils
+from api_v1.users.crud import get_user_by_username
+from api_v1.users.schemas import UserSchema
+from core.models import db_helper
+
+oauth2_scheme = OAuth2PasswordBearer(
+    tokenUrl="/api/v1/demo-auth/jwt/login/",
+)
+
+
+async def validate_auth_user(
+        username: str = Form(),
+        password: str = Form(),
+):
+    unauthed_exc = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="invalid username or password",
+    )
+    if not (user := get_user_by_username(session=db_helper.session_factory(), username=username)):
+        raise unauthed_exc
+
+    if not auth_utils.validate_password(
+            password=password,
+            hashed_password=user.password,
+    ):
+        raise unauthed_exc
+
+    if not user.active:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="user inactive",
+        )
+
+    return user
+
+
+def get_current_token_payload(
+        token: str = Depends(oauth2_scheme),
+) -> dict:
+    try:
+        payload = auth_utils.decode_jwt(
+            token=token,
+        )
+    except InvalidTokenError as e:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=f"invalid token error: {e}",
+            # detail=f"invalid token error",
+        )
+    return payload
+
+
+def get_current_auth_user(
+        payload: dict = Depends(get_current_token_payload),
+) -> UserSchema:
+    username: str | None = payload.get("sub")
+    if user := get_user_by_username(session=db_helper.session_factory(), username=username):
+        return user
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="token invalid (user not found)",
+    )
+
+
+def get_current_active_auth_user(
+        user: UserSchema = Depends(get_current_auth_user),
+):
+    if user.active:
+        return user
+    raise HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail="user inactive",
+    )
