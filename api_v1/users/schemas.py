@@ -1,7 +1,7 @@
 from pydantic import BaseModel, EmailStr, ConfigDict
 
 
-class UserSchema(BaseModel):
+class UserCreateSchema(BaseModel):
     model_config = ConfigDict(strict=True)
 
     username: str
@@ -10,3 +10,7 @@ class UserSchema(BaseModel):
     is_active: bool = True
 
 
+class UserSchema(BaseModel):
+    username: str
+    email: EmailStr | None = None
+    is_active: bool = True

@@ -9,11 +9,10 @@ from jwt.exceptions import InvalidTokenError
 
 from api_v1.auth import utils as auth_utils
 from api_v1.users.crud import get_user_by_username
-from api_v1.users.schemas import UserSchema
 from core.models import db_helper, User
 
 oauth2_scheme = OAuth2PasswordBearer(
-    tokenUrl="/api/v1/demo-auth/jwt/login/",
+    tokenUrl="/api/v1/auth/login/",
 )
 
 

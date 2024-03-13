@@ -1,11 +1,12 @@
-import asyncio
-
+from fastapi import HTTPException, status
+from fastapi.responses import JSONResponse
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api_v1.auth import utils
-from api_v1.users.schemas import UserSchema
-from core.models import User, db_helper
+from api_v1.users.schemas import UserCreateSchema
+from core.models import User
 
 
 async def get_user_by_username(session: AsyncSession, username: str) -> User | None:
@@ -14,20 +15,21 @@ async def get_user_by_username(session: AsyncSession, username: str) -> User | N
     return user
 
 
-async def get_user_list(session: AsyncSession):
+async def get_user_list(session: AsyncSession) -> list[User]:
     stmt = select(User)
-    # result: Result = await session.execute(stmt)
-    # users = result.scalars()
     users = await session.scalars(stmt)
-    for user in users:
-        print(user)
+    return list(users)
 
 
-async def create_user(session: AsyncSession, user_in: UserSchema) -> User:
+async def create_user(session: AsyncSession, user_in: UserCreateSchema) -> JSONResponse:
     user = user_in.model_dump()
     user["password"] = utils.hash_password(user["password"])
     user_model = User(**user)
-    session.add(user_model)
-    await session.commit()
-    # await session.refresh(user_model)
-    return user_model
+    try:
+        session.add(user_model)
+        await session.commit()
+    except IntegrityError:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT,
+                            detail={"message": f"User with username {user_model.username} already exists!"})
+    return JSONResponse(content={"message": f"User {user_model.username} created successfully!"},
+                        status_code=status.HTTP_201_CREATED)

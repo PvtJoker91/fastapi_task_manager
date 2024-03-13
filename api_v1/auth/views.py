@@ -5,7 +5,9 @@ from api_v1.auth.schemas import TokenInfo
 from api_v1.auth import utils as auth_utils
 from api_v1.users.schemas import UserSchema
 
-router = APIRouter(prefix="/jwt", tags=["JWT"])
+
+router = APIRouter(prefix="/auth", tags=["Auth JWT"])
+
 
 
 @router.post("/login/", response_model=TokenInfo)
