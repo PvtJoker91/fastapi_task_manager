@@ -10,7 +10,7 @@ from jwt.exceptions import InvalidTokenError
 from api_v1.auth import utils as auth_utils
 from api_v1.users.crud import get_user_by_username
 from api_v1.users.schemas import UserSchema
-from core.models import db_helper
+from core.models import db_helper, User
 
 oauth2_scheme = OAuth2PasswordBearer(
     tokenUrl="/api/v1/demo-auth/jwt/login/",
@@ -25,7 +25,7 @@ async def validate_auth_user(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="invalid username or password",
     )
-    if not (user := get_user_by_username(session=db_helper.session_factory(), username=username)):
+    if not (user := await get_user_by_username(session=db_helper.session_factory(), username=username)):
         raise unauthed_exc
 
     if not auth_utils.validate_password(
@@ -34,7 +34,7 @@ async def validate_auth_user(
     ):
         raise unauthed_exc
 
-    if not user.active:
+    if not user.is_active:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="user inactive",
@@ -59,11 +59,11 @@ def get_current_token_payload(
     return payload
 
 
-def get_current_auth_user(
+async def get_current_auth_user(
         payload: dict = Depends(get_current_token_payload),
-) -> UserSchema:
+) -> User:
     username: str | None = payload.get("sub")
-    if user := get_user_by_username(session=db_helper.session_factory(), username=username):
+    if user := await get_user_by_username(session=db_helper.session_factory(), username=username):
         return user
     raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -72,9 +72,9 @@ def get_current_auth_user(
 
 
 def get_current_active_auth_user(
-        user: UserSchema = Depends(get_current_auth_user),
+        user: User = Depends(get_current_auth_user),
 ):
-    if user.active:
+    if user.is_active:
         return user
     raise HTTPException(
         status_code=status.HTTP_403_FORBIDDEN,

@@ -7,6 +7,6 @@ class UserSchema(BaseModel):
     username: str
     password: str
     email: EmailStr | None = None
-    active: bool = True
+    is_active: bool = True
 
 

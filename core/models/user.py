@@ -9,6 +9,8 @@ from .base import Base
 class User(Base):
     username: Mapped[str] = mapped_column(String(32), unique=True)
     password: Mapped[bytes]
+    is_active: Mapped[bool]
+    email: Mapped[str | None]
 
     def __str__(self):
         return f"{self.__class__.__name__}(id={self.id}, username={self.username!r})"
