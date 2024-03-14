@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING
 
-from sqlalchemy.orm import Mapped, relationship
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import Mapped, relationship, mapped_column
 
 from src.apps.tasks.entities import TaskEntity
 from src.core.db import TimedBaseModel
@@ -12,8 +13,9 @@ if TYPE_CHECKING:
 class Task(TimedBaseModel):
     title: Mapped[str]
     description: Mapped[str | None]
-    user: Mapped["User"] = relationship(back_populates="tasks")
     is_visible: Mapped[bool]
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    user: Mapped["User"] = relationship(back_populates="tasks")
 
     def __str__(self):
         return f"{self.__class__.__name__}(id={self.id}, username={self.title!r})"
@@ -26,7 +28,7 @@ class Task(TimedBaseModel):
             id=self.id,
             title=self.title,
             description=self.description,
-            user=User.to_entity(self.user),
+            user_id=self.user.id,
             is_visible=self.is_visible,
             created_at=self.created_at,
             updated_at=self.updated_at,
