@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 from datetime import datetime
 
 from src.apps.users.entities import UserEntity
@@ -13,3 +13,6 @@ class TaskEntity:
     user: UserEntity
     created_at: datetime
     updated_at: datetime
+
+    def to_dict(self) -> dict:
+        return {k: str(v) for k, v in asdict(self).items()}

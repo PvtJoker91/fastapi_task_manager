@@ -1,3 +1,5 @@
+from typing import Iterable
+
 from fastapi import HTTPException, status
 from fastapi.responses import JSONResponse
 from sqlalchemy import select
@@ -15,10 +17,10 @@ async def get_user_by_username(session: AsyncSession, username: str) -> User | N
     return user
 
 
-async def get_user_list(session: AsyncSession) -> list[User]:
+async def get_user_list(session: AsyncSession) -> Iterable[User]:
     stmt = select(User)
     users = await session.scalars(stmt)
-    return list(users)
+    return users
 
 
 async def create_user(session: AsyncSession, user_in: UserCreateSchema) -> JSONResponse:
