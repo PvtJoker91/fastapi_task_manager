@@ -1,14 +1,18 @@
+from typing import TYPE_CHECKING
+
 from sqlalchemy.orm import Mapped, relationship
 
 from src.apps.tasks.entities import TaskEntity
-from src.apps.users.models import User
 from src.core.db import TimedBaseModel
+
+if TYPE_CHECKING:
+    from src.apps.users.models import User
 
 
 class Task(TimedBaseModel):
     title: Mapped[str]
-    description: Mapped[str]
-    user: Mapped[User] = relationship(back_populates="tasks")
+    description: Mapped[str | None]
+    user: Mapped["User"] = relationship(back_populates="tasks")
     is_visible: Mapped[bool]
 
     def __str__(self):

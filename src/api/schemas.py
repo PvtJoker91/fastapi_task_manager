@@ -21,7 +21,7 @@ class PingResponseSchema(BaseModel):
 
 class ListPaginatedResponse(BaseModel, Generic[TListItem]):
     items: list[TListItem]
-    pagination: PaginationOut
+    # pagination: PaginationOut
 
 
 class ApiResponse(BaseModel, Generic[TData]):
