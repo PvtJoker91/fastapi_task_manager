@@ -7,9 +7,9 @@ from fastapi import (
 from fastapi.security import OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError
 
-from api_v1.auth import utils as auth_utils
-from api_v1.users.crud import get_user_by_username
-from core.models import db_helper, User
+from src.apps.auth import utils as auth_utils
+from src.apps.users.services import get_user_by_username
+from src.core.models import db_helper, User
 
 oauth2_scheme = OAuth2PasswordBearer(
     tokenUrl="/api/v1/auth/login/",

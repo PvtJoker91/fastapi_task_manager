@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends
 
-from api_v1.auth.jwt import validate_auth_user, get_current_token_payload, get_current_active_auth_user
-from api_v1.auth.schemas import TokenInfo
-from api_v1.auth import utils as auth_utils
-from api_v1.users.schemas import UserSchema
+from src.apps.auth.services import validate_auth_user, get_current_token_payload, get_current_active_auth_user
+from src.api.v1.auth.schemas import TokenInfo
+from src.apps.auth import utils as auth_utils
+from src.api.v1.users.schemas import UserSchema
 
 
 router = APIRouter(prefix="/auth", tags=["Auth JWT"])
