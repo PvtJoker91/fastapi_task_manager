@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
-from .users.views import router as users_router
-from .auth.views import router as auth_router
+from .users.handlers import router as users_router
+from .auth.handlers import router as auth_router
 
 
 router = APIRouter(prefix="/v1")

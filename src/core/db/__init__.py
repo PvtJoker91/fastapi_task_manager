@@ -1,5 +1,5 @@
 __all__ = (
-    "Base",
+    "TimedBaseModel",
     "DatabaseHelper",
     "db_helper",
     "User",
@@ -7,7 +7,7 @@ __all__ = (
 )
 
 
-from .base import Base
+from .base import TimedBaseModel
 from .db_helper import DatabaseHelper, db_helper
 from src.apps.users.models import User
 

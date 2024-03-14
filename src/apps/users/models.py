@@ -2,10 +2,11 @@
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
 
-from src.core.models.base import Base
+from src.apps.users.entities import UserEntity
+from src.core.db.base import TimedBaseModel
 
 
-class User(Base):
+class User(TimedBaseModel):
     username: Mapped[str] = mapped_column(String(32), unique=True)
     password: Mapped[bytes]
     is_active: Mapped[bool]
@@ -16,3 +17,12 @@ class User(Base):
 
     def __repr__(self):
         return str(self)
+
+    def to_entity(self) -> UserEntity:
+        return UserEntity(
+            id=self.id,
+            username=self.username,
+            is_active=self.is_active,
+            email=self.email,
+            created_at=self.created_at
+        )

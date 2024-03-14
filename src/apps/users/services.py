@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.apps.auth import utils
 from src.api.v1.users.schemas import UserCreateSchema
-from src.core.models import User
+from src.core.db import User
 
 
 async def get_user_by_username(session: AsyncSession, username: str) -> User | None:
