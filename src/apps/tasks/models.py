@@ -28,7 +28,7 @@ class Task(TimedBaseModel):
             id=self.id,
             title=self.title,
             description=self.description,
-            user_id=self.user.id,
+            user_id=self.user_id,
             is_visible=self.is_visible,
             created_at=self.created_at,
             updated_at=self.updated_at,

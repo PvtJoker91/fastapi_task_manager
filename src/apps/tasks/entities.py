@@ -1,4 +1,4 @@
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass, asdict, field
 from datetime import datetime
 
 from src.apps.users.entities import UserEntity
@@ -6,13 +6,13 @@ from src.apps.users.entities import UserEntity
 
 @dataclass()
 class TaskEntity:
-    id: int  # noqa
+    id: int | None = field(default=None, kw_only=True)  # noqa
     title: str
     description: str
-    is_visible: bool
-    user: UserEntity
-    created_at: datetime
-    updated_at: datetime
+    user_id: int
+    is_visible: bool = True
+    created_at: datetime = field(default_factory=datetime.utcnow)
+    updated_at: datetime | None = field(default=None)
 
     def to_dict(self) -> dict:
-        return {k: str(v) for k, v in asdict(self).items()}
+        return {k: v for k, v in asdict(self).items()}
