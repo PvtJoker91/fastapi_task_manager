@@ -15,13 +15,9 @@ TData = TypeVar("TData")
 TListItem = TypeVar("TListItem")
 
 
-class PingResponseSchema(BaseModel):
-    result: bool
-
-
 class ListPaginatedResponse(BaseModel, Generic[TListItem]):
     items: list[TListItem]
-    # pagination: PaginationOut
+    pagination: PaginationOut
 
 
 class ApiResponse(BaseModel, Generic[TData]):
