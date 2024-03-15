@@ -1,8 +1,6 @@
 from dataclasses import dataclass, asdict, field
 from datetime import datetime
 
-from src.apps.users.entities import UserEntity
-
 
 @dataclass()
 class TaskEntity:

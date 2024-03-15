@@ -4,7 +4,7 @@ from src.apps.auth.services import validate_auth_user, get_current_token_payload
 from src.api.v1.auth.schemas import TokenInfo
 from src.apps.auth import utils as auth_utils
 from src.api.v1.users.schemas import UserSchema
-
+from src.apps.users.entities import UserEntity
 
 router = APIRouter(prefix="/auth", tags=["Auth JWT"])
 
@@ -31,11 +31,12 @@ def auth_user_issue_jwt(
 @router.get("/users/me/")
 def auth_user_check_self_info(
     payload: dict = Depends(get_current_token_payload),
-    user: UserSchema = Depends(get_current_active_auth_user),
+    user: UserEntity = Depends(get_current_active_auth_user),
 ):
     iat = payload.get("iat")
+    me = UserSchema.from_entity(user)
     return {
-        "username": user.username,
-        "email": user.email,
+        "username": me.username,
+        "email": me.email,
         "logged_in_at": iat,
     }

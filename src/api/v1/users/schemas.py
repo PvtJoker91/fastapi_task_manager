@@ -11,6 +11,14 @@ class UserCreateSchema(BaseModel):
     email: EmailStr | None = None
     is_active: bool = True
 
+    def to_entity(self):
+        return UserEntity(
+            username=self.username,
+            password=self.password,
+            email=self.email,
+            is_active=self.is_active,
+        )
+
 
 class UserSchema(BaseModel):
     id: int

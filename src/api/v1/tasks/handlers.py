@@ -20,7 +20,7 @@ async def get_task(
 ) -> TaskSchema:
     service = ORMTaskService()
     try:
-        task: TaskEntity | None = await service.get_by_id(session=session, task_id=task_id)
+        task: TaskEntity = await service.get_by_id(session=session, task_id=task_id)
     except TaskNotFound as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail={"message": e.message})

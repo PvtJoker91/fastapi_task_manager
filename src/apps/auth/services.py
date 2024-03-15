@@ -7,9 +7,11 @@ from fastapi import (
 from fastapi.security import OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError
 
+from src.api.v1.users.schemas import UserSchema
 from src.apps.auth import utils as auth_utils
-from src.apps.users.services import get_user_by_username
-from src.core.db import db_helper, User
+from src.apps.users.entities import UserEntity
+from src.apps.users.services import ORMUserService
+from src.core.db import db_helper
 
 oauth2_scheme = OAuth2PasswordBearer(
     tokenUrl="/api/v1/auth/login/",
@@ -19,12 +21,13 @@ oauth2_scheme = OAuth2PasswordBearer(
 async def validate_auth_user(
         username: str = Form(),
         password: str = Form(),
-):
+) -> UserEntity:
     unauthed_exc = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="invalid username or password",
     )
-    if not (user := await get_user_by_username(session=db_helper.session_factory(), username=username)):
+    service = ORMUserService()
+    if not (user := await service.get_user_by_username(session=db_helper.session_factory(), username=username)):
         raise unauthed_exc
 
     if not auth_utils.validate_password(
@@ -60,9 +63,10 @@ def get_current_token_payload(
 
 async def get_current_auth_user(
         payload: dict = Depends(get_current_token_payload),
-) -> User:
+) -> UserEntity:
+    service = ORMUserService()
     username: str | None = payload.get("sub")
-    if user := await get_user_by_username(session=db_helper.session_factory(), username=username):
+    if user := await service.get_user_by_username(session=db_helper.session_factory(), username=username):
         return user
     raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -71,8 +75,8 @@ async def get_current_auth_user(
 
 
 def get_current_active_auth_user(
-        user: User = Depends(get_current_auth_user),
-):
+        user: UserEntity = Depends(get_current_auth_user),
+) -> UserEntity:
     if user.is_active:
         return user
     raise HTTPException(

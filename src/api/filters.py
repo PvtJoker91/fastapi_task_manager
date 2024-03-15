@@ -1,6 +1,3 @@
-from enum import Enum
-from typing import Any
-
 from pydantic import BaseModel
 
 
@@ -15,5 +12,3 @@ class PaginationIn(BaseModel):
     limit: int = 20
 
 
-class DefaultFilter(Enum):
-    NOT_SET: Any

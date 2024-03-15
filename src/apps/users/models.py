@@ -27,6 +27,7 @@ class User(TimedBaseModel):
         return UserEntity(
             id=self.id,
             username=self.username,
+            password=self.password,
             is_active=self.is_active,
             email=self.email,
             created_at=self.created_at
