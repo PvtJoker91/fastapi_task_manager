@@ -2,15 +2,43 @@ from fastapi import APIRouter, status, HTTPException
 from fastapi.params import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.api.dependencies import UOWDep
 from src.api.filters import PaginationIn, PaginationOut
 from src.api.schemas import ListPaginatedResponse, ApiResponse
+from src.api.v1.tasks.filters import TaskFilter
 from src.api.v1.tasks.schemas import TaskSchema, TaskCreateSchema
 from src.apps.tasks.entities import TaskEntity
 from src.apps.tasks.exceptions import TaskNotFound
 from src.apps.tasks.services import ORMTaskService
 from src.core.db import db_helper
 
-router = APIRouter(tags=["Tasks"])
+router = APIRouter(prefix="/tasks", tags=["Tasks"])
+
+
+@router.get("/count")
+async def get_task_count(
+        filters: TaskFilter = Depends(),
+        session: AsyncSession = Depends(db_helper.scoped_session_dependency),
+):
+    service = ORMTaskService()
+    return await service.get_tasks_count(session=session, filters=filters)
+
+
+@router.get("/tasks-uow")
+async def get_tasks(
+        uow: UOWDep,
+        pagination_in: PaginationIn = Depends(),
+) -> ApiResponse[ListPaginatedResponse[TaskSchema]]:
+    tasks = await ORMTaskService().get_tasks(uow, pagination_in)
+    items = [TaskSchema.from_entity(obj) for obj in tasks]
+    pagination_out = PaginationOut(
+        offset=pagination_in.offset,
+        limit=pagination_in.limit,
+        total=len(items),
+    )
+    return ApiResponse(
+        data=ListPaginatedResponse(items=items, pagination=pagination_out),
+    )
 
 
 @router.get("/{task_id}", response_model=TaskSchema)

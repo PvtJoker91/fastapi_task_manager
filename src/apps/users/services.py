@@ -6,7 +6,6 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.filters import PaginationIn
-from src.api.v1.users.schemas import UserCreateSchema
 from src.apps.auth import utils
 from src.apps.users.entities import UserEntity
 from src.apps.users.exceptions import UserAlreadyExists, UserNotFound
@@ -37,14 +36,12 @@ class ORMUserService(BaseUserService):
                           ]
         return [user.to_entity() for user in paginated_users]
 
-
     async def get_user_by_username(self, session: AsyncSession, username: str = None) -> UserEntity:
         stmt = select(User).where(User.username == username)
         user: User | None = await session.scalar(stmt)
         if user:
             return user.to_entity()
         raise UserNotFound(username=username)
-
 
     async def create(self, session: AsyncSession, user_in: UserEntity) -> UserEntity:
         user = user_in.to_dict()

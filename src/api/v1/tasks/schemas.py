@@ -5,25 +5,13 @@ from pydantic import BaseModel
 from src.apps.tasks.entities import TaskEntity
 
 
-class TaskCreateSchema(BaseModel):
-    title: str
-    description: str | None
-    user_id: int
-
-    def to_entity(self):
-        return TaskEntity(
-            title=self.title,
-            description=self.description,
-            user_id=self.user_id
-        )
-
-
 class TaskSchema(BaseModel):
     id: int
     title: str
     description: str | None
     is_visible: bool = True
-    user_id: int
+    author_id: int
+    assignee_id: int
     created_at: datetime
     updated_at: datetime | None = None
 
@@ -34,7 +22,23 @@ class TaskSchema(BaseModel):
             title=entity.title,
             description=entity.description,
             is_visible=entity.is_visible,
-            user_id=entity.user_id,
+            author_id=entity.author_id,
+            assignee_id=entity.assignee_id,
             created_at=entity.created_at,
             updated_at=entity.updated_at,
+        )
+
+
+class TaskCreateSchema(BaseModel):
+    title: str
+    description: str | None
+    author_id: int
+    assignee_id: int
+
+    def to_entity(self):
+        return TaskEntity(
+            title=self.title,
+            description=self.description,
+            author_id=self.author_id,
+            assignee_id=self.assignee_id,
         )

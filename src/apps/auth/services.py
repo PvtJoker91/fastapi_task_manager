@@ -7,7 +7,6 @@ from fastapi import (
 from fastapi.security import OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError
 
-from src.api.v1.users.schemas import UserSchema
 from src.apps.auth import utils as auth_utils
 from src.apps.users.entities import UserEntity
 from src.apps.users.services import ORMUserService

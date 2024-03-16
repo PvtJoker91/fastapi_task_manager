@@ -7,7 +7,8 @@ class TaskEntity:
     id: int | None = field(default=None, kw_only=True)  # noqa
     title: str
     description: str
-    user_id: int
+    author_id: int
+    assignee_id: int
     is_visible: bool = True
     created_at: datetime = field(default_factory=datetime.utcnow)
     updated_at: datetime | None = field(default=None)
