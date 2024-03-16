@@ -3,8 +3,8 @@ from typing import TYPE_CHECKING
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.apps.users.entities import UserEntity
 from src.core.db.base import TimedBaseModel
+from src.apps.users.entities import UserEntity
 
 if TYPE_CHECKING:
     from src.apps.tasks.models import Task
@@ -15,7 +15,8 @@ class User(TimedBaseModel):
     password: Mapped[bytes]
     is_active: Mapped[bool]
     email: Mapped[str | None]
-    tasks: Mapped[list["Task"]] = relationship(back_populates="user")
+    created_tasks: Mapped[list["Task"]] = relationship(back_populates="author", foreign_keys="[Task.author_id]")
+    assigned_tasks: Mapped[list["Task"]] = relationship(back_populates="assignee", foreign_keys="[Task.assignee_id]")
 
     def __str__(self):
         return f"{self.__class__.__name__}(id={self.id}, username={self.username!r})"
