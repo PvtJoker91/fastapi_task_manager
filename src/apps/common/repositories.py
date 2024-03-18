@@ -1,17 +1,20 @@
 from abc import ABC, abstractmethod
 
-from sqlalchemy import insert, update, select
+from sqlalchemy import insert, update, select, delete
+from sqlalchemy.exc import NoResultFound, IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from src.apps.common.exceptions import ObjNotFoundException, ObjAlreadyExistsException
 
 
 class AbstractRepository(ABC):
 
     @abstractmethod
-    async def add_one(self):
+    async def add_one(self, data: dict):
         raise NotImplementedError
 
     @abstractmethod
-    async def edit_one(self):
+    async def edit_one(self, obj_id: int, data: dict):
         raise NotImplementedError
 
     @abstractmethod
@@ -29,24 +32,42 @@ class SQLAlchemyRepository(AbstractRepository):
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def add_one(self, data: dict) -> int:
-        stmt = insert(self.model).values(**data).returning(self.model.id)
-        res = await self.session.execute(stmt)
-        return res.scalar_one()
+    async def add_one(self, data: dict):
+        stmt = insert(self.model).values(**data).returning(self.model)
+        try:
+            dto = await self.session.execute(stmt)
+            await self.session.commit()
+            dto = dto.scalar_one()
+        except IntegrityError:
+            raise ObjAlreadyExistsException
+        return dto
 
-    async def edit_one(self, id: int, data: dict) -> int:
-        stmt = update(self.model).values(**data).filter_by(id=id).returning(self.model.id)
-        res = await self.session.execute(stmt)
-        return res.scalar_one()
+    async def edit_one(self, obj_id: int, data: dict):
+        stmt = update(self.model).values(**data).filter_by(id=obj_id).returning(self.model)
+        try:
+            dto = await self.session.execute(stmt)
+            await self.session.commit()
+            dto = dto.scalar_one()
+        except NoResultFound:
+            raise ObjNotFoundException
+        return dto
 
-    async def find_all(self):
-        stmt = select(self.model)
-        res = await self.session.execute(stmt)
-        res = [row[0].to_entity() for row in res.all()]
-        return res
+    async def delete_one(self, obj_id: int):
+        stmt = delete(self.model).filter_by(id=obj_id)
+        await self.session.execute(stmt)
+        await self.session.commit()
 
     async def find_one(self, **filter_by):
         stmt = select(self.model).filter_by(**filter_by)
-        res = await self.session.execute(stmt)
-        res = res.scalar_one().to_read_model()
-        return res
+        # res = await self.session.scalar(stmt) # None without exception
+        try:
+            dto = await self.session.execute(stmt)
+            dto = dto.scalar_one()
+        except NoResultFound:
+            raise ObjNotFoundException
+        return dto
+
+    async def find_all(self):
+        stmt = select(self.model)
+        dto_list = await self.session.scalars(stmt)
+        return dto_list

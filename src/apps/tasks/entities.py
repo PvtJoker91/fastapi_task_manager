@@ -4,14 +4,16 @@ from datetime import datetime
 
 @dataclass()
 class TaskEntity:
-    id: int | None = field(default=None, kw_only=True)  # noqa
-    title: str
-    description: str
-    author_id: int
-    assignee_id: int
+    id: int | None = None
+    title: str | None = None
+    description: str | None = None
+    author_id: int | None = None
+    assignee_id: int | None = None
     is_visible: bool = True
-    created_at: datetime = field(default_factory=datetime.utcnow)
-    updated_at: datetime | None = field(default=None)
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
 
     def to_dict(self) -> dict:
-        return {k: v for k, v in asdict(self).items()}
+        return {k: v for k, v in asdict(self).items() if v is not None}
+
+

@@ -42,3 +42,15 @@ class TaskCreateSchema(BaseModel):
             author_id=self.author_id,
             assignee_id=self.assignee_id,
         )
+
+
+class TaskUpdateSchema(BaseModel):
+    assignee_id: int
+    is_visible: bool
+
+    def to_entity(self):
+        return TaskEntity(
+            assignee_id=self.assignee_id,
+            is_visible=self.is_visible,
+            updated_at=datetime.utcnow(),
+        )

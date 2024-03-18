@@ -1,6 +1,27 @@
+from datetime import datetime
+
 from pydantic import BaseModel, EmailStr, ConfigDict
 
 from src.apps.users.entities import UserEntity
+
+
+
+
+
+class UserSchema(BaseModel):
+    id: int
+    username: str
+    email: EmailStr | None = None
+    is_active: bool = True
+
+    @staticmethod
+    def from_entity(entity: UserEntity) -> 'UserSchema':
+        return UserSchema(
+            id=entity.id,
+            username=entity.username,
+            email=entity.email,
+            is_active=entity.is_active,
+        )
 
 
 class UserCreateSchema(BaseModel):
@@ -20,17 +41,15 @@ class UserCreateSchema(BaseModel):
         )
 
 
-class UserSchema(BaseModel):
-    id: int
+class UserUpdateSchema(BaseModel):
     username: str
     email: EmailStr | None = None
-    is_active: bool = True
+    is_active: bool
 
-    @staticmethod
-    def from_entity(entity: UserEntity) -> 'UserSchema':
-        return UserSchema(
-            id=entity.id,
-            username=entity.username,
-            email=entity.email,
-            is_active=entity.is_active,
+    def to_entity(self):
+        return UserEntity(
+            username=self.username,
+            email=self.email,
+            is_active=self.is_active,
+            updated_at=datetime.utcnow(),
         )
