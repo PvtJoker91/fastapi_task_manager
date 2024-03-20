@@ -10,7 +10,6 @@ from jwt.exceptions import InvalidTokenError
 from src.apps.auth import utils as auth_utils
 from src.apps.users.entities import UserEntity
 from src.apps.users.services import ORMUserService
-from src.core.db import db_helper
 
 oauth2_scheme = OAuth2PasswordBearer(
     tokenUrl="/api/v1/auth/login/",

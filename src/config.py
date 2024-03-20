@@ -1,14 +1,16 @@
 from pathlib import Path
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-BASE_DIR = Path(__file__).parent.parent
+BASE_DIR = Path(__file__).parent
 
 
 class DbSettings(BaseSettings):
 
-    echo: bool = True
+
+    mode: str
+    echo: bool = False
     db_name: str
     db_host: str
     db_port: int

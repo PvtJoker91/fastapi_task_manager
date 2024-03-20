@@ -1,5 +1,4 @@
 from fastapi import APIRouter, status, Depends, HTTPException
-
 from src.api.filters import PaginationOut, PaginationIn
 from src.api.schemas import ApiResponse, ListPaginatedResponse
 from src.api.v1.users.schemas import UserSchema, UserCreateSchema

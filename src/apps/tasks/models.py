@@ -3,8 +3,8 @@ from typing import TYPE_CHECKING
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, relationship, mapped_column
 
-from src.core.db.base import TimedBaseModel
 from src.apps.tasks.entities import TaskEntity
+from src.db.base import TimedBaseModel
 
 if TYPE_CHECKING:
     from src.apps.users.models import User

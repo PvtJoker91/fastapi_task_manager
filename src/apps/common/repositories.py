@@ -2,10 +2,9 @@ from abc import ABC, abstractmethod
 
 from sqlalchemy import insert, update, select, delete, func
 from sqlalchemy.exc import NoResultFound, IntegrityError
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.apps.common.exceptions import ObjNotFoundException, ObjAlreadyExistsException
-from src.core.db import db_helper
+from src.db.db_helper import db_helper
 
 
 

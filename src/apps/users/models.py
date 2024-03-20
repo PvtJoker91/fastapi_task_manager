@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.core.db.base import TimedBaseModel
+from src.db.base import TimedBaseModel
 from src.apps.users.entities import UserEntity
 
 if TYPE_CHECKING:
