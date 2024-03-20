@@ -6,11 +6,19 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 BASE_DIR = Path(__file__).parent.parent
 
 
-class DbSettings(BaseModel):
-    db_url: str = "postgresql+asyncpg://task_manager_user:qwerty12345@localhost:5432/task_manager"
-    # echo: bool = False
+class DbSettings(BaseSettings):
+
     echo: bool = True
-    model_config = SettingsConfigDict(env_file=f"{BASE_DIR}/.env")
+    db_name: str
+    db_host: str
+    db_port: int
+    db_user: str
+    db_password: str
+    model_config = SettingsConfigDict(env_file=".env")
+
+    @property
+    def db_url(self):
+        return f"postgresql+asyncpg://{self.db_user}:{self.db_password}@{self.db_host}:{self.db_port}/{self.db_name}"
 
 
 class AuthJWT(BaseModel):
@@ -23,10 +31,7 @@ class AuthJWT(BaseModel):
 class Settings(BaseSettings):
 
     db: DbSettings = DbSettings()
-
     auth_jwt: AuthJWT = AuthJWT()
-
-    # db_echo: bool = True
 
 
 settings = Settings()

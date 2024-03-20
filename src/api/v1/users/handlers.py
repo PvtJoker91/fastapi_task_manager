@@ -1,6 +1,5 @@
 from fastapi import APIRouter, status, Depends, HTTPException
 
-from src.api.dependencies import UOWDep
 from src.api.filters import PaginationOut, PaginationIn
 from src.api.schemas import ApiResponse, ListPaginatedResponse
 from src.api.v1.users.schemas import UserSchema, UserCreateSchema
@@ -14,11 +13,10 @@ router = APIRouter(prefix="/users", tags=['Users'])
 @router.post("/",
              status_code=status.HTTP_201_CREATED, )
 async def create_user(
-        uow: UOWDep,
         user_in: UserCreateSchema,
 ) -> UserSchema:
     try:
-        user = await ORMUserService().create_user(uow, user_in=user_in.to_entity())
+        user = await ORMUserService().create_user(user_in=user_in.to_entity())
     except UserAlreadyExists as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                             detail={"message": e.message})
@@ -28,11 +26,10 @@ async def create_user(
 
 @router.get("/{username}", response_model=UserSchema)
 async def get_user_by_username(
-        uow: UOWDep,
         username: str,
 ) -> UserSchema:
     try:
-        user: UserEntity = await ORMUserService().get_user_by_username(uow, username=username)
+        user: UserEntity = await ORMUserService().get_user_by_username(username=username)
     except UserNotFound as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail={"message": e.message})
@@ -41,10 +38,9 @@ async def get_user_by_username(
 
 @router.get("/")
 async def get_user_list(
-        uow: UOWDep,
         pagination_in: PaginationIn = Depends(),
 ) -> ApiResponse[ListPaginatedResponse[UserSchema]]:
-    user_list = await ORMUserService().get_user_list(uow, pagination=pagination_in)
+    user_list = await ORMUserService().get_user_list(pagination=pagination_in)
     items = [UserSchema.from_entity(obj) for obj in user_list]
     pagination_out = PaginationOut(
         offset=pagination_in.offset,
