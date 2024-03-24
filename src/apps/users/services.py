@@ -2,7 +2,7 @@ from abc import abstractmethod, ABC
 from typing import Iterable
 
 # from src.api.filters import PaginationIn
-from src.apps.auth import utils
+from src.api.v1.auth import utils
 from src.apps.common.exceptions import ObjNotFoundException, ObjAlreadyExistsException
 from src.apps.users.entities import UserEntity
 from src.apps.users.exceptions import UserAlreadyExists, UserNotFound
@@ -34,7 +34,8 @@ class BaseUserService(ABC):
 
 
 class ORMUserService(BaseUserService):
-    repository = UserRepository()
+    def __init__(self, user_repository: type[UserRepository]):
+        self.repository: UserRepository = user_repository()
 
     async def create_user(self, user_in: UserEntity) -> UserEntity:
         user_dict = user_in.to_dict()

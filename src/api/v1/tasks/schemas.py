@@ -32,14 +32,14 @@ class TaskSchema(BaseModel):
 class TaskCreateSchema(BaseModel):
     title: str
     description: str | None
-    author_id: int
+    # author_id: int
     assignee_id: int
 
     def to_entity(self):
         return TaskEntity(
             title=self.title,
             description=self.description,
-            author_id=self.author_id,
+            # author_id=self.author_id,
             assignee_id=self.assignee_id,
         )
 

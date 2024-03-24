@@ -6,6 +6,7 @@ from src.apps.common.exceptions import ObjNotFoundException
 from src.apps.tasks.entities import TaskEntity
 from src.apps.tasks.exceptions import TaskNotFound
 from src.apps.tasks.models import Task as TaskModel
+from src.apps.common.repositories import AbstractRepository
 from src.apps.tasks.repositories import TaskRepository
 
 
@@ -34,8 +35,8 @@ class BaseTaskService(ABC):
 
 class ORMTaskService(BaseTaskService):
 
-    def __init__(self):
-        self.repository = TaskRepository()
+    def __init__(self, task_repository: type[TaskRepository]):
+        self.repository: TaskRepository = task_repository()
 
     async def create_task(self, task_in: TaskEntity) -> TaskEntity:
         task = task_in.to_dict()

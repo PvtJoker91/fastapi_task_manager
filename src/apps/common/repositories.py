@@ -7,8 +7,6 @@ from src.apps.common.exceptions import ObjNotFoundException, ObjAlreadyExistsExc
 from src.db.db_helper import db_helper
 
 
-
-
 class AbstractRepository(ABC):
 
     @abstractmethod
@@ -76,7 +74,6 @@ class SQLAlchemyRepository(AbstractRepository):
             stmt = select(self.model)
             dto_list = await self.session.scalars(stmt)
             return dto_list
-
 
     async def count(self) -> int:
         async with self.session:
