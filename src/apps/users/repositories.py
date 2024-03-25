@@ -5,4 +5,4 @@ from src.apps.users.models import User
 
 
 class UserRepository(SQLAlchemyRepository):
-    model: DeclarativeBase = User
+    model = User

@@ -4,7 +4,7 @@ from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.db.base import TimedBaseModel
-from src.apps.users.entities import UserEntity
+from src.apps.users.entities.users import UserEntity
 
 if TYPE_CHECKING:
     from src.apps.tasks.models import Task

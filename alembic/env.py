@@ -20,9 +20,7 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 from src.db.base import TimedBaseModel
-from src.apps.tasks.models import Task
-from src.apps.users.models import User
-from src.config import settings
+from project.config import settings
 
 target_metadata = TimedBaseModel.metadata
 

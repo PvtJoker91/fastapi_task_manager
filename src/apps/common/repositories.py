@@ -1,7 +1,10 @@
+
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 
 from sqlalchemy import insert, update, select, delete, func
 from sqlalchemy.exc import NoResultFound, IntegrityError
+from sqlalchemy.orm import DeclarativeBase
 
 from src.apps.common.exceptions import ObjNotFoundException, ObjAlreadyExistsException
 from src.db.db_helper import db_helper
@@ -18,6 +21,10 @@ class AbstractRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
+    async def delete_one(self, obj_id: int):
+        raise NotImplementedError
+
+    @abstractmethod
     async def find_all(self):
         raise NotImplementedError
 
@@ -25,7 +32,12 @@ class AbstractRepository(ABC):
     async def find_one(self):
         raise NotImplementedError
 
+    @abstractmethod
+    async def count(self):
+        raise NotImplementedError
 
+
+@dataclass
 class SQLAlchemyRepository(AbstractRepository):
     model = None
     session = db_helper.session_factory()

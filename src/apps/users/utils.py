@@ -3,17 +3,18 @@ from datetime import datetime, timedelta
 import bcrypt
 import jwt
 
-from src.config import settings
+from src.apps.users.entities.auth import TokenPayloadEntity
+from project.config import settings
 
 
 def encode_jwt(
-        payload: dict,
+        payload: TokenPayloadEntity,
         private_key: str = settings.auth_jwt.private_key_path.read_text(),
         algorithm: str = settings.auth_jwt.algorithm,
         expire_minutes: int = settings.auth_jwt.access_token_expire_minutes,
         expire_timedelta: timedelta | None = None,
 ) -> str:
-    to_encode = payload.copy()
+    to_encode = payload.to_dict()
     now = datetime.utcnow()
     if expire_timedelta:
         expire = now + expire_timedelta

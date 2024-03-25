@@ -2,10 +2,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, EmailStr, ConfigDict
 
-from src.apps.users.entities import UserEntity
-
-
-
+from src.apps.users.entities.users import UserEntity
 
 
 class UserSchema(BaseModel):
@@ -21,6 +18,19 @@ class UserSchema(BaseModel):
             username=entity.username,
             email=entity.email,
             is_active=entity.is_active,
+        )
+
+
+class UserLoginSchema(BaseModel):
+    model_config = ConfigDict(strict=True)
+
+    username: str
+    password: str
+
+    def to_entity(self):
+        return UserEntity(
+            username=self.username,
+            password=self.password,
         )
 
 

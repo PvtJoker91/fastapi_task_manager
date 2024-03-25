@@ -5,7 +5,6 @@ from fastapi.params import Depends
 
 from src.api.filters import PaginationIn, PaginationOut
 from src.api.schemas import ListPaginatedResponse, ApiResponse
-from src.api.v1.auth.dependencies import get_current_token_payload
 from src.api.v1.tasks.dependencies import task_service_dependency
 from src.api.v1.tasks.schemas import TaskSchema, TaskCreateSchema, TaskUpdateSchema
 from src.apps.tasks.entities import TaskEntity
@@ -19,7 +18,6 @@ router = APIRouter(prefix="/tasks", tags=["Tasks"])
 async def create_task(
         task_in: TaskCreateSchema,
         task_service: Annotated[ORMTaskService, Depends(task_service_dependency)],
-        token_payload: dict = Depends(get_current_token_payload),
 ) -> TaskSchema:
     task = await task_service.create_task(task_in=task_in.to_entity())
     task_schema = TaskSchema.from_entity(task)

@@ -1,4 +1,6 @@
 from fastapi import APIRouter
+from fastapi.security import OAuth2PasswordBearer
+
 from .v1 import router as v1_router
 
 

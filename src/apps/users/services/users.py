@@ -1,11 +1,13 @@
 from abc import abstractmethod, ABC
+from dataclasses import dataclass
 from typing import Iterable
 
+from src.apps.common.repositories import AbstractRepository
 # from src.api.filters import PaginationIn
-from src.api.v1.auth import utils
+from src.apps.users import utils
 from src.apps.common.exceptions import ObjNotFoundException, ObjAlreadyExistsException
-from src.apps.users.entities import UserEntity
-from src.apps.users.exceptions import UserAlreadyExists, UserNotFound
+from src.apps.users.entities.users import UserEntity
+from src.apps.users.exceptions.users import UserAlreadyExists, UserNotFound
 from src.apps.users.repositories import UserRepository
 from src.apps.users.models import User as UserModel
 
@@ -17,7 +19,7 @@ class BaseUserService(ABC):
         ...
 
     @abstractmethod
-    async def get_user_by_username(self, username: str) -> UserEntity:
+    async def get_by_username(self, username: str) -> UserEntity:
         ...
 
     @abstractmethod
@@ -33,9 +35,10 @@ class BaseUserService(ABC):
         ...
 
 
+@dataclass
 class ORMUserService(BaseUserService):
-    def __init__(self, user_repository: type[UserRepository]):
-        self.repository: UserRepository = user_repository()
+
+    repository = UserRepository()
 
     async def create_user(self, user_in: UserEntity) -> UserEntity:
         user_dict = user_in.to_dict()
@@ -57,7 +60,7 @@ class ORMUserService(BaseUserService):
     async def delete_user(self, user_id: int):
         await self.repository.delete_one(obj_id=user_id)
 
-    async def get_user_by_username(self, username: str) -> UserEntity:
+    async def get_by_username(self, username: str) -> UserEntity:
         try:
             user_dto: UserModel = await self.repository.find_one(username=username)
         except ObjNotFoundException:

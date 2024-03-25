@@ -2,7 +2,6 @@ import pytest_asyncio
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import sessionmaker
 
-from src.config import settings
 from src.db.base import TimedBaseModel as Base
 from src.db.db_helper import db_helper
 

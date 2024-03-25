@@ -1,16 +1,24 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Form
+from fastapi.security import OAuth2PasswordBearer
 
-from src.api.v1.auth import utils as auth_utils
-from src.api.v1.auth.dependencies import validate_auth_user, get_current_token_payload, get_current_active_auth_user
-from src.api.v1.auth.schemas import TokenInfo
+from src.api.v1.auth.dependencies import auth_service_dependency, token_use_case_dependency
+from src.api.v1.auth.schemas import TokenSchema, TokenPayloadSchema
 from src.api.v1.users.dependencies import user_service_dependency
-from src.api.v1.users.schemas import UserSchema, UserCreateSchema
-from src.apps.users.exceptions import UserAlreadyExists
-from src.apps.users.services import ORMUserService
+from src.api.v1.users.schemas import UserSchema, UserCreateSchema, UserLoginSchema
+from src.apps.common.exceptions import ServiceException
+from src.apps.users.entities.users import UserEntity
+from src.apps.users.exceptions.users import UserAlreadyExists
+from src.apps.users.services.auth import BaseAuthService
+from src.apps.users.services.users import ORMUserService
+from src.apps.users.use_cases.auth import IssueTokenUseCase
 
 router = APIRouter(prefix="/auth", tags=["Auth JWT"])
+
+oauth2_scheme = OAuth2PasswordBearer(
+    tokenUrl="/api/v1/auth/login/",
+)
 
 
 @router.post("/register/", status_code=status.HTTP_201_CREATED)
@@ -26,31 +34,34 @@ async def register_user(
                             detail={"message": e.message})
 
 
-@router.post("/login/", response_model=TokenInfo)
-def auth_user_issue_jwt(
-        user: UserSchema = Depends(validate_auth_user),
+@router.post("/login/", response_model=TokenSchema)
+async def auth_user_issue_jwt(
+        username: str = Form(),
+        password: str = Form(),
+        use_case: IssueTokenUseCase = Depends(token_use_case_dependency)
 ):
-    jwt_payload = {
-        "sub": user.id,
-        "username": user.username,
-        "email": user.email,
-    }
-    token = auth_utils.encode_jwt(jwt_payload)
-    return TokenInfo(
-        access_token=token,
-        token_type="Bearer",
-    )
+    try:
+        token = await use_case.execute(UserEntity(username=username, password=password))
+    except ServiceException as exception:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=exception.message,
+        ) from exception
+
+    return TokenSchema.from_entity(token)
 
 
 @router.get("/me/")
 def auth_user_check_self_info(
-        payload: dict = Depends(get_current_token_payload),
-        user: UserSchema = Depends(get_current_active_auth_user),
+        token: str = Depends(oauth2_scheme),
+        service: BaseAuthService = Depends(auth_service_dependency)
 ):
-    iat = payload.get("iat")
-    return {
-        "id": user.id,
-        "username": user.username,
-        "email": user.email,
-        "logged_in_at": iat,
-    }
+    try:
+        payload = service.get_user_from_token(token)
+    except ServiceException as exception:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=exception.message,
+        ) from exception
+
+    return TokenPayloadSchema.from_entity(payload)

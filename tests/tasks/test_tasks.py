@@ -3,7 +3,7 @@ import pytest_asyncio
 
 from src.apps.tasks.entities import TaskEntity
 from src.apps.tasks.services import ORMTaskService
-from src.apps.users.entities import UserEntity
+from src.apps.users.entities.users import UserEntity
 from src.apps.users.services import ORMUserService
 
 
