@@ -21,19 +21,6 @@ class UserSchema(BaseModel):
         )
 
 
-class UserLoginSchema(BaseModel):
-    model_config = ConfigDict(strict=True)
-
-    username: str
-    password: str
-
-    def to_entity(self):
-        return UserEntity(
-            username=self.username,
-            password=self.password,
-        )
-
-
 class UserCreateSchema(BaseModel):
     model_config = ConfigDict(strict=True)
 
