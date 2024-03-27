@@ -4,7 +4,7 @@ import bcrypt
 import jwt
 
 from src.apps.users.entities.auth import TokenPayloadEntity
-from project.config import settings
+from src.project.config import settings
 
 
 def encode_jwt(

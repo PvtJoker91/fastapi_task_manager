@@ -5,7 +5,7 @@ from typing import Iterable
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.apps.common.exceptions import ObjNotFoundException, ObjAlreadyExistsException
-from src.apps.users import utils
+from src.apps.users.utils import auth as auth_utils
 from src.apps.users.entities.users import UserEntity
 from src.apps.users.exceptions.users import UserAlreadyExists, UserNotFound
 from src.apps.users.models import User as UserModel
@@ -41,7 +41,7 @@ class ORMUserService(BaseUserService):
 
     async def create_user(self, user_in: UserEntity, session: AsyncSession) -> UserEntity:
         user_dict = user_in.to_dict()
-        user_dict["password"] = utils.hash_password(user_dict["password"])
+        user_dict["password"] = auth_utils.hash_password(user_dict["password"])
         try:
             user_dto = await self.repository.add_one(data=user_dict, session=session)
         except ObjAlreadyExistsException:
@@ -51,7 +51,7 @@ class ORMUserService(BaseUserService):
     async def update_user(self, user_id: int, user_in: UserEntity, session: AsyncSession) -> UserEntity:
         user_dict = user_in.to_dict()
         try:
-            user_dto = await self.repository.edit_one(obj_id=user_id, data=user_dict)
+            user_dto = await self.repository.edit_one(obj_id=user_id, data=user_dict, session=session)
         except ObjNotFoundException:
             raise UserNotFound(user_id=user_id, session=session)
         return user_dto.to_entity()

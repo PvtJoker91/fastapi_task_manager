@@ -8,8 +8,6 @@ from src.apps.users.services.auth import BaseAuthService, BaseAuthValidatorServi
 from src.apps.users.services.users import BaseUserService
 
 
-
-
 @dataclass
 class IssueTokenUseCase:
     user_service: BaseUserService

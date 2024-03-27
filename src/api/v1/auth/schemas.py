@@ -3,6 +3,10 @@ from pydantic import BaseModel
 from src.apps.users.entities.auth import TokenEntity, TokenPayloadEntity
 
 
+class RegisterOutSchema(BaseModel):
+    message: str
+
+
 class TokenPayloadSchema(BaseModel):
     sub: str
     email: str | None

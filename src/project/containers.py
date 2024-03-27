@@ -12,9 +12,12 @@ from src.apps.users.services.auth import (BaseAuthService, BaseAuthValidatorServ
                                           AuthActiveUserValidatorService, AuthTokenValidatorService,
                                           AuthPasswordValidatorService)
 from src.apps.users.services.auth import JWTAuthService
+from src.apps.users.services.codes import BaseCodeService, CacheCodeService
+from src.apps.users.services.senders import BaseSenderService, EmailSenderService
 from src.apps.users.services.users import BaseUserService
 from src.apps.users.services.users import ORMUserService
 from src.apps.users.use_cases.auth import IssueTokenUseCase
+from src.apps.users.use_cases.users import UserRegisterUseCase, UserActivateUseCase
 
 
 @lru_cache(1)
@@ -44,14 +47,22 @@ def _initialize_container() -> punq.Container:
     # initialize services
     container.register(BaseAuthService, JWTAuthService)
     container.register(BaseUserService, ORMUserService)
+    container.register(BaseCodeService, CacheCodeService)
+    container.register(BaseSenderService, EmailSenderService)
+
+
+
     container.register(AuthPasswordValidatorService)
     container.register(AuthTokenValidatorService)
     container.register(AuthActiveUserValidatorService)
+
 
     container.register(BaseAuthValidatorService, factory=build_validators)
 
     # init use cases
     container.register(IssueTokenUseCase)
+    container.register(UserRegisterUseCase)
+    container.register(UserActivateUseCase)
 
 
     return container

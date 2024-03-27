@@ -6,7 +6,7 @@ from datetime import datetime
 class UserEntity:
     id: int | None = None
     username: str | None = None
-    is_active: bool = True
+    is_active: bool = False
     email: str | None = None
     password: str | bytes | None = None
     created_at: datetime | None = None

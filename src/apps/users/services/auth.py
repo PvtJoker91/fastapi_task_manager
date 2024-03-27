@@ -1,13 +1,12 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
-from fastapi import Depends
 from jwt import InvalidTokenError
 
-from src.apps.users import utils as auth_utils
 from src.apps.users.entities.auth import TokenPayloadEntity
 from src.apps.users.entities.users import UserEntity
 from src.apps.users.exceptions.auth import IncorrectPassword, UserIsNotActive, InvalidToken
+from src.apps.users.utils import auth as auth_utils
 
 
 class BaseAuthService(ABC):
@@ -28,7 +27,6 @@ class JWTAuthService(BaseAuthService):
         )
         token = auth_utils.encode_jwt(jwt_payload)
         return token
-
 
     def get_user_from_token(self, token: str) -> TokenPayloadEntity:
         try:
@@ -72,16 +70,15 @@ class AuthActiveUserValidatorService(BaseAuthValidatorService):
             raise UserIsNotActive(username=user.username)
 
 
-
 @dataclass
 class ComposedAuthValidatorService(BaseAuthValidatorService):
     validators: list[BaseAuthValidatorService]
 
     def validate(
-        self,
-        user: UserEntity,
-        password: bytes | None = None,
-        token: str | None = None,
+            self,
+            user: UserEntity,
+            password: bytes | None = None,
+            token: str | None = None,
     ):
         for validator in self.validators:
             validator.validate(user=user, password=password, token=token)
